@@ -13,8 +13,15 @@ class CacheLinkedList:
     def __init__(self):
         self.head = None
     
-    #add node to the head of the list
-    def addNode(self, key, value):
+    def add_node(self, key, value):
+        """
+        Add node to the head of the list
+
+        Parameters:
+        key: int
+        value: any
+        """
+
         new_node = Node(key = key, value = value)
         new_node.next = self.head
         new_node.prev = None
@@ -25,13 +32,17 @@ class CacheLinkedList:
 
         self.head = new_node
 
-    #delete last node of linked list
-    def deleteLastNode(self):
+
+    def delete_last_node_and_return_key(self):
+        """
+        Search for the last node of linked list, remove it from the list and return it is key
+        """
+
         current = self.head
         prev_curr = None
 
         if current == None:
-            print('List has no elements to delete')
+            print('List has no elements')
             return
         
         #check for the last node
@@ -41,18 +52,17 @@ class CacheLinkedList:
         
         #free last node
         prev_curr.next = None
+        return current.key
 
-    def getLastNode(self):
-        current = self.head
-        if current == None:
-            print('Empty list')
 
-        while current.next != None:
-            current = current.next
-        return current
+    def move_node_to_start(self, key, newValue):
+        """
+        Move most recently used node to the head of the list and update the value of the item
 
-    #move most recently used node to the head of the list and update the value of the item
-    def moveNodeToStart(self, key, newValue):
+        Parameters:
+        key: int
+        newValue: any
+        """
         current = self.head
         prev_curr = None
 
@@ -84,8 +94,10 @@ class CacheLinkedList:
         self.head = temp
 
     
-    #print all list items
-    def printList(self):
+    def print_list(self):
+        """
+        Print the linked list
+        """
         current = self.head
         if current == None:
             print('List is Empty')
@@ -104,34 +116,57 @@ class Cache:
         self.hashMap = hashMap
         self.cacheList = cacheList
     
-    def incrementCurrentSize(self):
+    def increment_current_size(self):
+        """
+        Increment the current size / number of items
+        """
         self.currentSize += 1
 
-    def decrementCurrentSize(self):
+    def decrement_current_size(self):
+        """
+        Decrement the current size / number of items
+        """
         self.currentSize -= 1
 
 
-    def setItem(self, key, value):
-        #if the key already exists, update the value in both map and linked list
+    def set_item(self, key, value):
+        """
+        Set the new item to the map and list based on it is key existance and manage the cache based on LRU algorithm
+
+        Parameters:
+        key: int
+        value: any
+        """
+        #if the key already exists, update the value in both map and linked list and move the node to head of linked list
         if key in self.hashMap:
             self.hashMap[key] = value
-            self.cacheList.moveNodeToStart(key, value)
+            self.cacheList.move_node_to_start(key, value)
             return
         
+        #if number of items exceeds the max size (capacity), remove the LRU at end of list from the list and map
         if self.currentSize == self.capacity:
-            lastNode = self.cacheList.getLastNode()
-            self.cacheList.deleteLastNode()
-            self.hashMap.pop(lastNode.key)
-            self.decrementCurrentSize()
+            lastNodeKey = self.cacheList.delete_last_node_and_return_key()
+            self.hashMap.pop(lastNodeKey)
+            self.decrement_current_size()
 
-        self.cacheList.addNode(key, value)
+        #add the new node to the list and map
+        self.cacheList.add_node(key, value)
         self.hashMap[key] = value
-        self.incrementCurrentSize()
+        self.increment_current_size()
 
     
-    def getItem(self, key):
+    def get_item(self, key):
+        """
+        Search for the key in the cache and return it is value if it exists
+
+        Parameters:
+        key: int
+
+        Returns:
+        None || value: any
+        """
         if key in self.hashMap:
-            self.cacheList.moveNodeToStart(key, self.hashMap[key])
+            self.cacheList.move_node_to_start(key, self.hashMap[key])
             return self.hashMap[key]
         else:
             return None
