@@ -1,4 +1,4 @@
-#node of the linked list / key-value pair
+#node of the linked list / key-value Pair
 class Node:
     def __init__(self, key, value):
         self.key = key
@@ -8,7 +8,7 @@ class Node:
     
     #setters and getters
 
-#double linked list to store items
+#double linked list to manage the LRU 
 class CacheLinkedList:
     def __init__(self):
         self.head = None
@@ -25,8 +25,7 @@ class CacheLinkedList:
 
         self.head = new_node
 
-
-    #remove node from the end of the list
+    #delete last node of linked list
     def deleteLastNode(self):
         current = self.head
         prev_curr = None
@@ -43,14 +42,24 @@ class CacheLinkedList:
         #free last node
         prev_curr.next = None
 
+    def getLastNode(self):
+        current = self.head
+        if current == None:
+            print('Empty list')
 
-    #move most recently used node to the head of the list
-    def moveNodeToStart(self, key):
+        while current.next != None:
+            current = current.next
+        return current
+
+    #move most recently used node to the head of the list and update the value of the item
+    def moveNodeToStart(self, key, newValue):
         current = self.head
         prev_curr = None
 
         #if the list is empty or contains only one node or the required node is already in the head
         if current == None or current.next == None or current.key == key:
+            if current.value != newValue:
+                current.value = newValue
             return
 
         #check for the required node, and keep the previous node of the current one inside prev_curr
@@ -71,6 +80,7 @@ class CacheLinkedList:
         #move node to head
         temp.next = self.head
         temp.prev = None
+        temp.value = newValue
         self.head = temp
 
     
@@ -86,7 +96,7 @@ class CacheLinkedList:
         print()
 
 
-#Map/dictionary used as a cache with LRU algorithm
+#LRU Cache 
 class Cache:
     def __init__(self, currentSize, capacity, hashMap, cacheList):
         self.currentSize = currentSize
@@ -101,21 +111,30 @@ class Cache:
         self.currentSize -= 1
 
 
-    #Most recently used item will be always stored in the front of the list, while LRU one will be at the end of the list
-    #when user add new item, it will check if the key of this item already exists in the cache or not
-
-    def addNewItem(self, key, value):
-        #if item exists, it will move it to the head of list to indicate that it is most recently used
+    def setItem(self, key, value):
+        #if the key already exists, update the value in both map and linked list
         if key in self.hashMap:
-            self.cacheList.moveNodeToStart(key)
-        else:
-            #if the item does not exist and the current size of items exceeds the max capacity of the cache
-            #LRU item which is the last item will be removed from the cache and then the new item will be added
-            if self.currentSize >= self.capacity:
-                self.cacheList.deleteLastNode()
-                self.decrementCurrentSize()
-            self.cacheList.addNode(key, value)
             self.hashMap[key] = value
-            self.incrementCurrentSize()
+            self.cacheList.moveNodeToStart(key, value)
+            return
+        
+        if self.currentSize == self.capacity:
+            lastNode = self.cacheList.getLastNode()
+            self.cacheList.deleteLastNode()
+            self.hashMap.pop(lastNode.key)
+            self.decrementCurrentSize()
+
+        self.cacheList.addNode(key, value)
+        self.hashMap[key] = value
+        self.incrementCurrentSize()
+
+    
+    def getItem(self, key):
+        if key in self.hashMap:
+            self.cacheList.moveNodeToStart(key, self.hashMap[key])
+            return self.hashMap[key]
+        else:
+            return None
+
 
             
