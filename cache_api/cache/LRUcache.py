@@ -109,27 +109,13 @@ class CacheLinkedList:
 
 
 #LRU Cache 
-class Cache:
-    def __init__(self, currentSize, capacity, hashMap, cacheList):
-        self.currentSize = currentSize
+class LRUCache:
+    def __init__(self, capacity):
         self.capacity = capacity
-        self.hashMap = hashMap
-        self.cacheList = cacheList
-    
-    def increment_current_size(self):
-        """
-        Increment the current size / number of items
-        """
-        self.currentSize += 1
+        self.hash_map = {}
+        self.cache_list = CacheLinkedList()
 
-    def decrement_current_size(self):
-        """
-        Decrement the current size / number of items
-        """
-        self.currentSize -= 1
-
-
-    def set_item(self, key, value):
+    def put(self, key, value):
         """
         Set the new item to the map and list based on it is key existance and manage the cache based on LRU algorithm
 
@@ -138,24 +124,24 @@ class Cache:
         value: any
         """
         #if the key already exists, update the value in both map and linked list and move the node to head of linked list
-        if key in self.hashMap:
-            self.hashMap[key] = value
-            self.cacheList.move_node_to_start(key, value)
+        if key in self.hash_map:
+            self.hash_map[key] = value
+            self.cache_list.move_node_to_start(key, value)
             return
         
         #if number of items exceeds the max size (capacity), remove the LRU at end of list from the list and map
-        if self.currentSize == self.capacity:
-            lastNodeKey = self.cacheList.delete_last_node_and_return_key()
-            self.hashMap.pop(lastNodeKey)
-            self.decrement_current_size()
+        if len(self.hash_map) == self.capacity:
+            last_node_key = self.cache_list.delete_last_node_and_return_key()
+            self.hash_map.pop(last_node_key)
 
         #add the new node to the list and map
-        self.cacheList.add_node(key, value)
-        self.hashMap[key] = value
-        self.increment_current_size()
+        self.cache_list.add_node(key, value)
+        self.hash_map[key] = value
+        print(self.hash_map)
+        self.cache_list.print_list()
 
     
-    def get_item(self, key):
+    def get(self, key):
         """
         Search for the key in the cache and return it is value if it exists
 
@@ -165,11 +151,8 @@ class Cache:
         Returns:
         None || value: any
         """
-        if key in self.hashMap:
-            self.cacheList.move_node_to_start(key, self.hashMap[key])
-            return self.hashMap[key]
+        if key in self.hash_map:
+            self.cache_list.move_node_to_start(key, self.hash_map[key])
+            return self.hash_map[key]
         else:
             return None
-
-
-            
