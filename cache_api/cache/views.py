@@ -8,11 +8,9 @@
 #while inside the linked list is O(n)
 
 
-import requests, json
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .LRUcache import LRUCache
-import urllib.parse
 
 cache = LRUCache(3)
 
