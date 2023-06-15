@@ -14,7 +14,7 @@ from .LRUcache import LRUCache
 from pymongo import MongoClient
 import time
 
-conn_string = "mongodb+srv://naghammasalmah:mongodb@cache.xqftwya.mongodb.net/?retryWrites=true&w=majority"
+conn_string = "mongodb+srv://naghammasalmah:mongodb@cluster0.utxq31t.mongodb.net/?retryWrites=true&w=majority"
 mongo_client = MongoClient(conn_string, port=27017)
 db = mongo_client['cache_db']
 collection = db['cache']

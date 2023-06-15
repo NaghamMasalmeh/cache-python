@@ -11,39 +11,17 @@ services:
       - db
     environment:
         - DJANGO_SETTINGS_MODULE=cache_api.settings
-        - MONGO_HOST=mongodb
-    depends_on:
-      - migration
+        - MONGO_HOST=mongo
   
   db:
       image: mongo
       restart: always
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: naghammasalmah
-        MONGO_INITDB_ROOT_PASSWORD: fXVkOITNj4fqwoLc
+      
       ports:
         - 27017:27017
       hostname: db
       volumes:
         - mongodb_data_container:/data/db
-  
-  migration:
-    build: .
-    image: app
-    command: python manage.py migrate
-    links:
-      - db
-    depends_on:
-      - make_migrations
-  
-  make_migrations:
-    build: .
-    image: app
-    command: python manage.py makemigrations
-    links:
-      - db
-    depends_on:
-      - db
 
 volumes:
   mongodb_data_container:

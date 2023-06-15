@@ -1,4 +1,6 @@
 #test file used to test put and get apis using django
+#set DJANGO_SETTINGS_MODULE=cache_api.settings
+
 
 import requests
 from cache.views import put_in_db, get_from_db
