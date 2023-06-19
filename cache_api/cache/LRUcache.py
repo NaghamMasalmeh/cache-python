@@ -13,7 +13,7 @@ class CacheLinkedList:
     def __init__(self):
         self.head = None
     
-    def add_node(self, key, value):
+    def add_node(self, key: int, value: any) -> None:
         """
         Add node to the head of the list
 
@@ -33,7 +33,7 @@ class CacheLinkedList:
         self.head = new_node
 
 
-    def delete_last_node_and_return_key(self):
+    def delete_last_node_and_return_key(self) -> int:
         """
         Search for the last node of linked list, remove it from the list and return it is key
         """
@@ -55,7 +55,7 @@ class CacheLinkedList:
         return current.key
 
 
-    def move_node_to_start(self, key, newValue):
+    def move_node_to_start(self, key: int, newValue: any) -> None:
         """
         Move most recently used node to the head of the list and update the value of the item
 
@@ -115,7 +115,7 @@ class LRUCache:
         self.hash_map = {}
         self.cache_list = CacheLinkedList()
 
-    def put(self, key, value):
+    def put(self, key: int, value: any) -> None:
         """
         Set the new item to the map and list based on it is key existance and manage the cache based on LRU algorithm
 
@@ -141,7 +141,7 @@ class LRUCache:
         self.cache_list.print_list()
 
     
-    def get(self, key):
+    def get(self, key: int) -> any:
         """
         Search for the key in the cache and return it is value if it exists
 
