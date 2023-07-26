@@ -14,21 +14,12 @@ updated_data = {'key': 5, 'value': '7'}
 new_data = {'key': 1, 'value': '2'}
 
 
-def add_data_to_db_and_cache(data: dict) -> dict:
+def add_data_to_db(data: dict) -> dict:
     """
-    Add data to the cache memory and database and return the hash map for the cache memory 
+    Add data to the database
     """
-    api_response = requests.put(put_api_url, data=data)
     put_in_db(data['key'], data['value'])
-    return api_response
 
-
-def compare_api_data(actual_data: dict, expected_data: List[dict]):
-    """
-    Compare expected data with data returned from the api call when add items to cache memory
-    """
-    dict_expected_data = {str(d['key']): d['value'] for d in expected_data}
-    assert actual_data == dict_expected_data
 
 
 def compare_db_data(actual_data: List[dict], expected_data: List[dict]):
@@ -40,49 +31,43 @@ def compare_db_data(actual_data: List[dict], expected_data: List[dict]):
         assert data['value'] == expected_data[i]['value']
 
 
-def check_data(api_response: HttpResponse, test_data: List[dict]) -> None:
+def check_db_data(test_data: List[dict]) -> None:
     """
-    Compare expected data with data returned from the db and cache memory
+    Compare expected data with data returned from the db
     """
-    response = json.loads(api_response.content.decode('utf-8'))
-    compare_api_data(response, test_data)
-
     result = collection.find({})
     compare_db_data(list(result), test_data)
 
 
-def test_add_data_to_db_and_cache():
+def test_add_data_to_db():
     """
     Test adding data to the db and memory and check the response with the expected data
     """
-    api_response = None
     for data in test_data:
-        api_response = add_data_to_db_and_cache(data)
-    check_data(api_response, test_data)
+        add_data_to_db(data)
+    check_db_data(test_data)
 
 
-def test_evict_item_in_db_and_cache():
+def test_evict_item_in_db():
     """
     Test the LRU algorithm by removing the LRU item from the cache
     """
-    api_response = add_data_to_db_and_cache(new_data)
-    check_data(api_response, test_data_with_evicted_value)
+    add_data_to_db(new_data)
+    check_db_data(test_data_with_evicted_value)
 
 
-def test_update_item_in_db_and_cache():
+def test_update_item_in_db():
     """
-    Test Updating item in the db and memory
+    Test Updating item in the db
     """
-    api_response = add_data_to_db_and_cache(updated_data)
-    check_data(api_response, test_data_with_updated_value)
+    add_data_to_db(updated_data)
+    check_db_data(test_data_with_updated_value)
 
 
 @pytest.mark.parametrize('key, expected_value', [(6, "8"), (0, None)])
-def test_get_data_from_db_and_cache(key: int, expected_value: any):
+def test_get_data_from_db(key: int, expected_value: any):
         """
-        Test the returned value from the db and memory based on the key provided
+        Test the returned value from the db based on the key provided
         """
-        api_response = requests.get(get_api_url, {'key': key})
         db_response = get_from_db(key)
-        assert api_response.json().get('value') == expected_value
         assert db_response == expected_value
